@@ -37,7 +37,10 @@ function preload(){
 }
 	
 function create(){
-	 var Bull = new Phaser.Class({
+	spacebg=this.add.tileSprite(0,0,this.sys.canvas.width*2,this.sys.canvas.height*2,'spaceBG');
+	player=this.makePlayer(this.sys.canvas.width/2,this.sys.canvas.height-10);
+	scoreText=this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
+	var Bull = new Phaser.Class({
 
 			Extends: Phaser.GameObjects.Image,
 			initialize:function Bullet (scene)
@@ -65,11 +68,8 @@ function create(){
 				}
 			}
 
-		});
-	scoreText=this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
-	//console.log("calling Create");
-	spacebg=this.add.tileSprite(0,0,this.sys.canvas.width*2,this.sys.canvas.height*2,'spaceBG');
-	player=this.makePlayer(this.sys.canvas.width/2,this.sys.canvas.height-10);
+	});
+		//console.log("calling Create");
 	player.setScale(.05);
 	//this.physics.enable(player,Phaser.Physics.ARCADE);
 	//console.log(spacebg._tilePosition);
@@ -103,7 +103,7 @@ function update(){
 			bullet=bullets.get();
 			if(bullet){
 				player.props.score++;
-				scoreText.setText('Score: ' + score);
+				scoreText.setText('Score: ' + player.props.score);
 				bullet.fire(player.x,player.y);
 			}//bullet=bullets.getFirst(false,true, player.x, player.y-80,'bullet',0, false);
 			//bullet.scale=0.071;
