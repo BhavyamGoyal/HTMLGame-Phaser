@@ -96,7 +96,8 @@ function update(){
 	}else if(leftKey.isDown && player.x >0+player.displayWidth*player.originX){
 		player.x-=player.props.speed;
 	}
-	if(fireButton.isDown){
+	if(this.input.activePointer.isDown){
+		player.x=this.input.activePointer.x;
 		if(this.time.now>bulletTime){
 			bullet=bullets.get();
 			if(bullet){
