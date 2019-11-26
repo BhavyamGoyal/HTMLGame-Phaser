@@ -39,7 +39,7 @@ function preload(){
 function create(){
 	spacebg=this.add.tileSprite(0,0,this.sys.canvas.width*2,this.sys.canvas.height*2,'spaceBG');
 	player=this.makePlayer(this.sys.canvas.width/2,this.sys.canvas.height-10);
-	scoreText=this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
+	scoreText=this.add.text(16, 16, 'Score: 0', { fontSize: '28px', fill: '#ffff' });
 	var Bull = new Phaser.Class({
 
 			Extends: Phaser.GameObjects.Image,
