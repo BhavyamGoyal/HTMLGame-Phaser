@@ -14,7 +14,6 @@ var phaserConfig={
 		preload: preload,
 		create: create,
 		update: update,
-
 		extend: {
 			makePlayer: makePlayer
 		}
@@ -26,6 +25,7 @@ var fireButton;
 var leftKey;
 var rightKey;
 var spacebg;
+var scoreText;
 var bullets,bullet;
 var game = new Phaser.Game(phaserConfig);
 var bulletTime=0;
@@ -66,6 +66,7 @@ function create(){
 			}
 
 		});
+	scoreText=this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#000' });
 	//console.log("calling Create");
 	spacebg=this.add.tileSprite(0,0,this.sys.canvas.width*2,this.sys.canvas.height*2,'spaceBG');
 	player=this.makePlayer(this.sys.canvas.width/2,this.sys.canvas.height-10);
@@ -101,7 +102,9 @@ function update(){
 		if(this.time.now>bulletTime){
 			bullet=bullets.get();
 			if(bullet){
-			bullet.fire(player.x,player.y);
+				player.props.score++;
+				scoreText.setText('Score: ' + score);
+				bullet.fire(player.x,player.y);
 			}//bullet=bullets.getFirst(false,true, player.x, player.y-80,'bullet',0, false);
 			//bullet.scale=0.071;
 			
@@ -120,5 +123,6 @@ function makePlayer(x,y){
 	var player = this.add.image(x,y,"player").setOrigin(0.5,1);
 	player.props={};
 	player.props.speed=10;
+	player.props.score=0;
 	return player;
 }
