@@ -5,12 +5,12 @@ var physicsConfig = {
 		debug: false
 	}
 }
-
+console.log();
 
 var phaserConfig = {
 	type: Phaser.AUTO,
-	//width: ,
-	//height: ,
+	width:document.getElementById('gameDiv').clientWidth,
+	height:document.getElementById('gameDiv').clientHeight,
 	parent:"gameDiv",
 	physics: physicsConfig,
 	scene: {
@@ -37,10 +37,10 @@ function preload() {
 	this.load.image('spaceBG', 'assets/spaceBG.jpg');
 	this.load.image('bullet', 'assets/bullet.png');
 }
+
 function create() {
-	this.sys.canvas.width=document.getElementById('gameDiv').clientWidth;
-	this.sys.canvas.height=document.getElementById('gameDiv').clientHeight;
-	spacebg = this.add.tileSprite(this,0, 0, this.sys.canvas.width, this.sys.canvas.height, "spaceBG");
+	spacebg = this.add.tileSprite(0,0, this.sys.canvas.width, this.sys.canvas.height,'spaceBG');
+	spacebg.setOrigin(0,0);
 	player = this.makePlayer(this.sys.canvas.width / 2, this.sys.canvas.height - 10);
 	scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '28px', fill: '#ffff' });
 	var Bull = new Phaser.Class({
@@ -80,7 +80,7 @@ function create() {
 }
 
 function update() {
-	spacebg._tilePosition.y += bv;
+	spacebg.tilePositionY += bv;
 	if (rightKey.isDown && player.x < this.sys.canvas.width - player.displayWidth * player.originX) {
 		player.x += player.props.speed;
 	} else if (leftKey.isDown && player.x > 0 + player.displayWidth * player.originX) {
