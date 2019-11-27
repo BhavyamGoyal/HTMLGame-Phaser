@@ -91,13 +91,12 @@ function update() {
 		player.x = this.input.activePointer.x;
 		if (this.time.now > bulletTime) {
 			bullet = bullets.get();
-			bullet.body.debugShowBody = true;
 			if (bullet) {
 				player.props.score++;
 				scoreText.setText('Score: ' + player.props.score);
 				bullet.fire(player.x, player.y);
 			}
-			bulletTime = this.time.now + 150;
+			bulletTime = this.time.now + 130;
 		}
 	}
 }
