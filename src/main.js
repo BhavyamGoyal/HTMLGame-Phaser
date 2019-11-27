@@ -6,10 +6,12 @@ var physicsConfig = {
 	}
 }
 
+
 var phaserConfig = {
 	type: Phaser.AUTO,
-	width: 800,
-	hieght: 600,
+	//width: ,
+	//height: ,
+	parent:"gameDiv",
 	physics: physicsConfig,
 	scene: {
 		preload: preload,
@@ -35,13 +37,13 @@ function preload() {
 	this.load.image('spaceBG', 'assets/spaceBG.jpg');
 	this.load.image('bullet', 'assets/bullet.png');
 }
-
 function create() {
-	spacebg = this.add.tileSprite(0, 0, this.sys.canvas.width * 2, this.sys.canvas.height * 2, 'spaceBG');
+	this.sys.canvas.width=document.getElementById('gameDiv').clientWidth;
+	this.sys.canvas.height=document.getElementById('gameDiv').clientHeight;
+	spacebg = this.add.tileSprite(this,0, 0, this.sys.canvas.width, this.sys.canvas.height, "spaceBG");
 	player = this.makePlayer(this.sys.canvas.width / 2, this.sys.canvas.height - 10);
 	scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '28px', fill: '#ffff' });
 	var Bull = new Phaser.Class({
-
 		Extends: Phaser.GameObjects.Image,
 		initialize: function Bullet(scene) {
 			Phaser.GameObjects.Image.call(this, scene, player.x, player.y - 80, 'bullet');
@@ -63,6 +65,7 @@ function create() {
 		}
 
 	});
+
 	player.setScale(.05);
 	bv = -0.7;
 	leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
@@ -88,7 +91,6 @@ function update() {
 		if (this.time.now > bulletTime) {
 			bullet = bullets.get();
 			bullet.body.debugShowBody = true;
-			console.log(bullet);
 			if (bullet) {
 				player.props.score++;
 				scoreText.setText('Score: ' + player.props.score);
@@ -102,7 +104,6 @@ function update() {
 function makePlayer(x, y) {
 	var player = this.physics.add.image(x, y, "player").setOrigin(0.5, 1);
 	player.body.allowGravity = false;
-	console.log(player);
 	player.props = {};
 	player.props.speed = 10;
 	player.props.score = 0;
