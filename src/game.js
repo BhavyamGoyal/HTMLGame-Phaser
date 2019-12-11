@@ -48,7 +48,7 @@ var GameScene = {
             console.log(value);
             loadText.setText("loading...  " + parseInt(value * 100) + "%");
         });
-        ShowLoading();
+        ShowLoading(loadText);
         this.load.on('fileprogress', function(file) {
             console.log(file.src);
         });
