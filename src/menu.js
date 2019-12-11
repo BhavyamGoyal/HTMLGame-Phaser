@@ -16,7 +16,7 @@ var MenuScene = {
         });
 
         this.load.on('fileprogress', function(file) {
-            console.log(file);
+            console.log(file.src);
         });
         this.load.on('complete', function() {
             console.log('complete');

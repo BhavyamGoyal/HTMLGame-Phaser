@@ -19,6 +19,16 @@ var Bull = new Phaser.Class({
         }
     }
 });
+var ShowLoading = function(text) {
+    let i = 0;
+    setTimeout(() => {
+        if (i < 95) {
+            text.setText("loading...  " + i + "%");
+            i++;
+            ShowLoading(text);
+        }
+    }, 150);
+}
 var GameScene = {
     key: 'gameScene',
     init: function(data) {
@@ -38,9 +48,9 @@ var GameScene = {
             console.log(value);
             loadText.setText("loading...  " + parseInt(value * 100) + "%");
         });
-
+        ShowLoading();
         this.load.on('fileprogress', function(file) {
-            console.log(file);
+            console.log(file.src);
         });
         this.load.on('complete', function() {
             console.log('complete');
