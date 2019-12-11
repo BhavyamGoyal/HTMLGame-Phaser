@@ -1,3 +1,24 @@
+var Bull = new Phaser.Class({
+    Extends: Phaser.GameObjects.Image,
+    initialize: function Bullet(scene) {
+        Phaser.GameObjects.Image.call(this, scene, player.x, player.y - 80, 'bullet');
+        //this.setScale(0.07);
+       
+    },
+    fire: function (x, y) {     
+        this.setPosition(x, y - 85);
+        this.setActive(true);
+        this.setVisible(true);
+        this.body.setVelocity(0, -500);
+        this.body.enable = true;
+    },
+    update: function (time, delta) {
+        if (this.y < 00) {
+            this.setActive(false);
+            this.setVisible(false);
+        }
+    }
+});
 
 var GameScene = {
     key: 'gameScene',
@@ -11,68 +32,112 @@ var GameScene = {
             bgY = 0;
         }
     },
-
-    preload: function () {  
+   
+    preload: function () {
+        this.load.image('rock', 'assets/player2.png');
+        this.load.spritesheet('boom', 'assets/explosion2.png', { frameWidth: 100, frameHeight: 100, endFrame: 81 });
+        this.load.spritesheet('astroid', 'assets/astroid.png', { frameWidth: 128, frameHeight: 128, endFrame: 81 });
     },
 
     create: function () {
-        bulletTime = 0;
+        gameOn = true;
+        astroidTime = 1000;
+        this.anims.create({
+            key: 'astroidRotate',
+            frames: this.anims.generateFrameNumbers('astroid', { start: 1, end: 31, first: 0 }),
+            frameRate: 13,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'explode',
+            frames: this.anims.generateFrameNumbers('boom', { start: 0, end: 81, first: 0 }),
+            frameRate: 60
+
+        });
+
+        this.events.on('Explode', explosionHandler, this);
+
+        
         spacebg = this.add.tileSprite(0, 0, this.sys.canvas.width, this.sys.canvas.height, background);
         spacebg.setOrigin(0, 0);
         spacebg.tilePositionY = bgY;
-        player = this.makePlayer(this.sys.canvas.width / 2, this.sys.canvas.height - 10);
-        scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '28px', fill: '#FFFFFF' });
-        var Bull = new Phaser.Class({
-            Extends: Phaser.GameObjects.Image,
-            initialize: function Bullet(scene) {
-                Phaser.GameObjects.Image.call(this, scene, player.x, player.y - 80, 'bullet');
-                this.debugShowBody = false;
-                this.scale = 0.07;
-                this.debugShowVelocity = false;
-            },
-            fire: function (x, y) {
-                this.setPosition(x, y - 50);
-                this.setActive(true);
-                this.setVisible(true);
-            },
-            update: function (time, delta) {
-                this.y -= 15;
-                if (this.y < 00) {
-                    this.setActive(false);
-                    this.setVisible(false);
-                }
-            }
-        });
-        player.setScale(shipScale);
         bv = -0.7;
-        leftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
-        rightKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        
+        scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '28px', fill: '#FFFFFF' });
+        bulletTime = 0;
+
+        player = this.makePlayer(this.sys.canvas.width / 2, this.sys.canvas.height - 10);
+        player.setSize(1000 ,1000, true);
+        player.setScale(shipScale);
+
         bullets = this.physics.add.group({
             classType: Bull,
-            maxSize: 10,
+            maxSize: 20,
             runChildUpdate: true,
-            allowGravity: false
+            allowGravity: false,
         });
         bullets.setOrigin(0.5, 1);
+
+        group = this.physics.add.group({
+            allowGravity: false,
+            runChildUpdate: true,
+            defaultKey: 'astroid',
+            maxSize: 10,
+            runChildUpdate:true
+        });
+        console.log(group);
+        
+        //collisions use worl events to use benifits of pool;
+        var collider = this.physics.add.collider(bullets, group, null, function (bullet, obj) {
+            obj.setActive(false);
+            astroidTime--;
+            obj.setVisible(false);
+            bullet.setActive(false);
+            bullet.setVisible(false);
+            bullet.body.enable = false;
+            obj.body.enable = false;
+            player.props.score++;
+            scoreText.setText('Score: ' + player.props.score);
+            this.events.emit('Explode', obj.x, obj.y);
+        }, this);
+
+        var playerCollider = this.physics.add.collider(player, group, null, (player, obj)=> {
+            
+            obj.setActive(false);
+            obj.setVisible(false);
+            obj.body.enable = false;
+            player.setActive(false);
+            player.setVisible(false);
+            boom = this.physics.add.sprite(player.x, player.y - 50, 'boom');
+            boom.scale = 1;
+            boom.anims.play('explode');
+            this.physics.world.removeCollider(playerCollider);
+            gameOn = false;
+            setTimeout(() => { console.log(this.scene.start('menuScene')); }, 2000);
+            
+        }, this);
+        //**collision
+
+        this.time.addEvent({
+            delay: astroidTime,
+            loop: true,
+            callback: addAstroid
+        });
+
     },
 
     update: function () {
         spacebg.tilePositionY += bv;
-        if (rightKey.isDown && player.x < this.sys.canvas.width - player.displayWidth * player.originX) {
-            this.player.x += this.player.props.speed;
-        } else if (leftKey.isDown && player.x > 0 + player.displayWidth * player.originX) {
-            player.x -= player.props.speed;
-        }
-        if (this.input.activePointer.isDown) {
+        if (this.input.activePointer.isDown && gameOn) {
             player.x = this.input.activePointer.x;
             if (this.time.now > bulletTime) {
                 bullet = bullets.get();
                 if (bullet) {
-                    player.props.score++;
-                    scoreText.setText('Score: ' + player.props.score);
+                    bullet.setScale(0.07);
                     bullet.fire(player.x, player.y);
                 }
-                bulletTime = this.time.now + 130;
+                bulletTime = this.time.now + 500;
             }
         }
     },
@@ -83,8 +148,32 @@ var GameScene = {
             player.body.allowGravity = false;
             player.props = {};
             player.props.speed = 10;
+            player.setDebug(true, true, 0xadfefe);
             player.props.score = 0;
             return player;
         }
     }
+}
+
+var explosionHandler = function (x, y) {
+    boom = this.physics.add.sprite(x, y, 'boom');
+    boom.scale = .5;
+    boom.anims.play('explode');
+}
+
+function addAstroid() {
+    let astroid = group.get(Phaser.Math.Between(0,game.canvas.width), -20);
+    if (!astroid) return; // None free
+    activateAstroid(astroid);
+}
+
+function activateAstroid(astroid) {
+    astroid.setActive(true)
+        .setVisible(true)
+        //.setTint(Phaser.Display.Color.RandomRGB().color)
+        .play('astroidRotate')
+        .setScale(0.5);
+    astroid.body.enable=true;
+    astroid.body.setVelocity(0, Phaser.Math.Between(100, 175));
+    //astroid.setSize(110, 110, true);
 }

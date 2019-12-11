@@ -14,6 +14,7 @@ var MenuScene = {
         this.load.image('player2', 'assets/player2.png');
     },
     create: function () {
+        
         spacebg = this.add.tileSprite(0, 0, this.sys.canvas.width, this.sys.canvas.height, 'spaceBG');
         spacebg.setOrigin(0, 0);
         spacebg.tilePositionY = bgY;
