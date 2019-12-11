@@ -9,16 +9,21 @@ var MenuScene = {
     },
     preload: function() {
 
+        loadText = this.add.text(this.sys.canvas.width / 2, this.sys.canvas.height / 2, "loading...  0%", { fontSize: '40px', fill: '#FFFFFF' });
         this.load.on('progress', function(value) {
             console.log(value);
+            loadText.setText("loading...  " + parseInt(value * 100) + "%");
         });
 
         this.load.on('fileprogress', function(file) {
-            console.log(file.src);
+            console.log(file);
         });
         this.load.on('complete', function() {
             console.log('complete');
         });
+        this.load.image('rock', 'assets/player2.png');
+        this.load.spritesheet('boom', 'assets/explosion2.png', { frameWidth: 100, frameHeight: 100, endFrame: 81 });
+        this.load.spritesheet('astroid', 'assets/astroid.png', { frameWidth: 128, frameHeight: 128, endFrame: 81 });
         this.load.image('player', 'assets/player.png');
         this.load.image('spaceBG', 'assets/spaceBG.jpg');
         this.load.image('bullet', 'assets/bullet.png');

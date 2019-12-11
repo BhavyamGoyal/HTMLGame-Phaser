@@ -19,7 +19,6 @@ var Bull = new Phaser.Class({
         }
     }
 });
-
 var GameScene = {
     key: 'gameScene',
     init: function(data) {
@@ -34,14 +33,14 @@ var GameScene = {
     },
 
     preload: function() {
-        loadText = this.add.text(this.sys.canvas.width / 2, this.sys.canvas.height / 2, '0%', { fontSize: '40px', fill: '#FFFFFF' });
+        loadText = this.add.text(this.sys.canvas.width / 2, this.sys.canvas.height / 2, "loading...  0%", { fontSize: '40px', fill: '#FFFFFF' });
         this.load.on('progress', function(value) {
             console.log(value);
-            loadText.setText(parseInt(value * 100) + "%");
+            loadText.setText("loading...  " + parseInt(value * 100) + "%");
         });
 
         this.load.on('fileprogress', function(file) {
-            console.log(file.src);
+            console.log(file);
         });
         this.load.on('complete', function() {
             console.log('complete');
