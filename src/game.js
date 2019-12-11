@@ -3,16 +3,16 @@ var Bull = new Phaser.Class({
     initialize: function Bullet(scene) {
         Phaser.GameObjects.Image.call(this, scene, player.x, player.y - 80, 'bullet');
         //this.setScale(0.07);
-       
+
     },
-    fire: function (x, y) {     
+    fire: function(x, y) {
         this.setPosition(x, y - 85);
         this.setActive(true);
         this.setVisible(true);
         this.body.setVelocity(0, -500);
         this.body.enable = true;
     },
-    update: function (time, delta) {
+    update: function(time, delta) {
         if (this.y < 00) {
             this.setActive(false);
             this.setVisible(false);
@@ -22,7 +22,7 @@ var Bull = new Phaser.Class({
 
 var GameScene = {
     key: 'gameScene',
-    init: function (data) {
+    init: function(data) {
         if (data != null) {
             bgY = data.bgY;
             background = data.background;
@@ -32,14 +32,26 @@ var GameScene = {
             bgY = 0;
         }
     },
-   
-    preload: function () {
+
+    preload: function() {
+        loadText = this.add.text(this.sys.canvas.width / 2, this.sys.canvas.height / 2, '0%', { fontSize: '40px', fill: '#FFFFFF' });
+        this.load.on('progress', function(value) {
+            console.log(value);
+            loadText.setText(parseInt(value * 100) + "%");
+        });
+
+        this.load.on('fileprogress', function(file) {
+            console.log(file.src);
+        });
+        this.load.on('complete', function() {
+            console.log('complete');
+        });
         this.load.image('rock', 'assets/player2.png');
         this.load.spritesheet('boom', 'assets/explosion2.png', { frameWidth: 100, frameHeight: 100, endFrame: 81 });
         this.load.spritesheet('astroid', 'assets/astroid.png', { frameWidth: 128, frameHeight: 128, endFrame: 81 });
     },
 
-    create: function () {
+    create: function() {
         gameOn = true;
         astroidTime = 1000;
         this.anims.create({
@@ -58,17 +70,17 @@ var GameScene = {
 
         this.events.on('Explode', explosionHandler, this);
 
-        
+
         spacebg = this.add.tileSprite(0, 0, this.sys.canvas.width, this.sys.canvas.height, background);
         spacebg.setOrigin(0, 0);
         spacebg.tilePositionY = bgY;
         bv = -0.7;
-        
+
         scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '28px', fill: '#FFFFFF' });
         bulletTime = 0;
 
         player = this.makePlayer(this.sys.canvas.width / 2, this.sys.canvas.height - 10);
-        player.setSize(1000 ,1000, true);
+        player.setSize(1000, 1000, true);
         player.setScale(shipScale);
 
         bullets = this.physics.add.group({
@@ -83,13 +95,13 @@ var GameScene = {
             allowGravity: false,
             runChildUpdate: true,
             defaultKey: 'astroid',
-            maxSize: 10,
-            runChildUpdate:true
+            maxSize: 100,
+            runChildUpdate: true
         });
         console.log(group);
-        
+
         //collisions use worl events to use benifits of pool;
-        var collider = this.physics.add.collider(bullets, group, null, function (bullet, obj) {
+        var collider = this.physics.add.collider(bullets, group, null, function(bullet, obj) {
             obj.setActive(false);
             astroidTime--;
             obj.setVisible(false);
@@ -102,8 +114,8 @@ var GameScene = {
             this.events.emit('Explode', obj.x, obj.y);
         }, this);
 
-        var playerCollider = this.physics.add.collider(player, group, null, (player, obj)=> {
-            
+        var playerCollider = this.physics.add.collider(player, group, null, (player, obj) => {
+
             obj.setActive(false);
             obj.setVisible(false);
             obj.body.enable = false;
@@ -115,7 +127,7 @@ var GameScene = {
             this.physics.world.removeCollider(playerCollider);
             gameOn = false;
             setTimeout(() => { console.log(this.scene.start('menuScene')); }, 2000);
-            
+
         }, this);
         //**collision
 
@@ -127,7 +139,7 @@ var GameScene = {
 
     },
 
-    update: function () {
+    update: function() {
         spacebg.tilePositionY += bv;
         if (this.input.activePointer.isDown && gameOn) {
             player.x = this.input.activePointer.x;
@@ -143,7 +155,7 @@ var GameScene = {
     },
 
     extend: {
-        makePlayer: function (x, y) {
+        makePlayer: function(x, y) {
             var player = this.physics.add.image(x, y, ship).setOrigin(0.5, 1);
             player.body.allowGravity = false;
             player.props = {};
@@ -155,14 +167,14 @@ var GameScene = {
     }
 }
 
-var explosionHandler = function (x, y) {
+var explosionHandler = function(x, y) {
     boom = this.physics.add.sprite(x, y, 'boom');
     boom.scale = .5;
     boom.anims.play('explode');
 }
 
 function addAstroid() {
-    let astroid = group.get(Phaser.Math.Between(0,game.canvas.width), -20);
+    let astroid = group.get(Phaser.Math.Between(0, game.canvas.width), -20);
     if (!astroid) return; // None free
     activateAstroid(astroid);
 }
@@ -173,7 +185,7 @@ function activateAstroid(astroid) {
         //.setTint(Phaser.Display.Color.RandomRGB().color)
         .play('astroidRotate')
         .setScale(0.5);
-    astroid.body.enable=true;
+    astroid.body.enable = true;
     astroid.body.setVelocity(0, Phaser.Math.Between(100, 175));
     //astroid.setSize(110, 110, true);
 }
