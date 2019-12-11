@@ -1,10 +1,10 @@
-var ShowLoading = function(text) {
-    let i = 0;
+var ShowLoading = function(text, i) {
+
     setTimeout(() => {
         if (i < 95) {
             text.setText("loading...  " + i + "%");
             i++;
-            ShowLoading(text);
+            ShowLoading(text, i);
         }
     }, 150);
 }
@@ -25,7 +25,7 @@ var MenuScene = {
             console.log(value);
             loadText.setText("loading...  " + parseInt(value * 100) + "%");
         });
-        ShowLoading(loadText);
+        ShowLoading(loadText, 0);
         this.load.on('fileprogress', function(file) {
             console.log(file.src);
         });
